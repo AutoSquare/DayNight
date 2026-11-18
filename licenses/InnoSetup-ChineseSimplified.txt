@@ -1,0 +1,6 @@
+ChineseSimplified.isl — Inno Setup 6.4 简体中文语言文件
+
+来源：https://github.com/kira-96/Inno-Setup-Chinese-Simplified-Translation（6.4.0+ 标签）
+维护者：Zhenghan Yang (Kira)
+授权：MIT License，见仓库 LICENSE 文件
+用途：编译进 Setup\daynight.iss 生成的安装程序，提供安装与卸载界面的简体中文文案。

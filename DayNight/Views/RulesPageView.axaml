@@ -1,0 +1,253 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:DayNight.Views"
+             x:Class="DayNight.Views.RulesPageView">
+
+    <UserControl.Styles>
+        <Style Selector="Button.dn-btn">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="7"/>
+        </Style>
+        <Style Selector="Button.edit-plan">
+            <Setter Property="Background" Value="{DynamicResource DnCardSolidBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="TextBlock.column-label">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="Button.dn-btn.primary">
+            <Setter Property="Foreground" Value="{DynamicResource DnCardSolidBrush}"/>
+        </Style>
+        <Style Selector="Button.page-help">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style Selector="Button.page-help PathIcon">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText3Brush}"/>
+        </Style>
+        <Style Selector="Button.page-help:pointerover PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-row">
+            <Setter Property="Padding" Value="12,11"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="Border.rule-row:pointerover">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-row.current">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-mark">
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        <Style Selector="Border.rule-mark TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="10.5"/>
+        </Style>
+        <Style Selector="Border.rule-mark.current TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource DnCardSolidBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-mark.current">
+            <Setter Property="Background" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-mark.ended TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="Border.rule-mark.ended">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="Border.rule-mark.nextday">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style Selector="Border.rule-mark.nextday TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.theme-name">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.theme-info">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="TextBlock.cover">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="Border.rule-thumb">
+            <Setter Property="Width" Value="64"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="Border.rule-thumb TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Button.icon-btn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="CornerRadius" Value="5"/>
+        </Style>
+        <Style Selector="Button.icon-btn PathIcon">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText3Brush}"/>
+        </Style>
+        <Style Selector="Button.icon-btn:pointerover PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="Button.icon-btn.danger:pointerover PathIcon">
+            <Setter Property="Foreground" Value="#C42B1C"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Spacing="16">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Classes="dn-title" Text="时段规则" VerticalAlignment="Center"/>
+                    <Button Classes="page-help" Click="ShowHelp" ToolTip.Tip="本页说明">
+                        <PathIcon Data="{StaticResource IconQuestion}" Width="17" Height="17"/>
+                    </Button>
+                </StackPanel>
+                <Button Grid.Column="1" Classes="dn-btn edit-plan" IsVisible="{Binding !IsEditing}"
+                        Command="{Binding EditPlanCommand}" AutomationProperties.Name="编辑计划">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Width="14" Height="14" VerticalAlignment="Center"
+                                  Data="M15.5 3.5l5 5-12 12-6 1 1-6 12-12z M5.4 16.4l-.5 2.7 2.7-.5 9.9-9.9-2.2-2.2-9.9 9.9z"/>
+                        <TextBlock VerticalAlignment="Center" Text="编辑计划"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" IsVisible="{Binding IsEditing}">
+                    <Button Classes="dn-btn" Content="取消编辑" Command="{Binding DiscardChangesCommand}"/>
+                    <Button Classes="dn-btn primary" Content="保存计划" Command="{Binding SavePlanCommand}"
+                            IsEnabled="{Binding HasPendingChanges}"/>
+                </StackPanel>
+            </Grid>
+
+            <Border Classes="dn-card" Padding="20,16">
+                <StackPanel>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="section-title" Text="全天分布"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <TextBlock Text="自动切换" VerticalAlignment="Center"/>
+                            <ToggleSwitch IsChecked="{Binding AutoSwitchOn}" AutomationProperties.Name="自动切换"/>
+                        </StackPanel>
+                    </Grid>
+                    <local:ScheduleBand x:Name="MiniBand" IsHitTestVisible="{Binding IsEditing}"
+                                        Focusable="{Binding IsEditing}" Height="70"/>
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="0,8,0,0">
+                        <TextBlock Classes="dn-sub" Text="{Binding ScheduleStatusText}" IsVisible="{Binding HasManualHold}"
+                                   TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <TextBlock Classes="dn-sub" Grid.Row="1" Text="拖动分界线按 5 分钟调整，点时段时间可精确到分钟。"
+                                   IsVisible="{Binding IsEditing}" TextWrapping="Wrap"/>
+                        <Button Grid.Column="1" Classes="dn-btn" Content="复位自动调度" IsVisible="{Binding !IsEditing}"
+                                Command="{Binding ResetScheduleCommand}" ToolTip.Tip="撤销手动调整，恢复当前时段"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Classes="dn-card" Padding="20,16">
+                <StackPanel>
+                    <Grid ColumnDefinitions="*,Auto" MinHeight="34">
+                        <TextBlock Classes="section-title" Text="切换计划"/>
+                        <Button Grid.Column="1" Classes="dn-btn" Content="添加时段"
+                                IsVisible="{Binding IsEditing}" Command="{Binding AddSegmentCommand}"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="142,*,140" Margin="12,12,12,8">
+                        <TextBlock Classes="column-label" Text="开始时间"/>
+                        <TextBlock Grid.Column="1" Classes="column-label" Text="主题"/>
+                        <TextBlock Grid.Column="2" Classes="column-label" Text="结束时间" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <Border Height="1" Background="{DynamicResource DnStrokeBrush}" Margin="0,0,0,4"/>
+                    <ItemsControl ItemsSource="{Binding RuleItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="rule-row" Classes.ended="{Binding IsEnded}" Classes.current="{Binding IsCurrent}">
+                                    <Grid ColumnDefinitions="142,*,128,Auto" RowDefinitions="Auto">
+                                        <!-- 起始时刻（HH:mm） -->
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                                                    VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding StartTimeText}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" IsVisible="{Binding !IsEditing}"/>
+                                            <Button Classes="dn-btn" Click="OpenClock" IsVisible="{Binding IsEditing}"
+                                                    ToolTip.Tip="在表盘上选择开始时间">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <PathIcon Data="{StaticResource IconClock}" Width="15" Height="15"/>
+                                                    <TextBlock Text="{Binding StartTimeText}"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </StackPanel>
+                                        <!-- 主题（下拉选择） -->
+                                        <Grid Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,0,12,0" VerticalAlignment="Center">
+                                            <Border Classes="rule-thumb" Background="{Binding ThumbBrush}"/>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="3">
+                                                <TextBlock Classes="theme-name" TextTrimming="CharacterEllipsis" Text="{Binding ThemeName}" IsVisible="{Binding !IsEditing}"/>
+                                                <ComboBox IsVisible="{Binding IsEditing}" ItemsSource="{Binding Themes}"
+                                                          SelectedItem="{Binding SelectedTheme}"
+                                                          MinHeight="26" Padding="8,3" FontSize="13"
+                                                          HorizontalAlignment="Left" MinWidth="150" MaxWidth="240">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                                <TextBlock Classes="theme-info" Text="{Binding ThemeInfoText}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <!-- 覆盖范围 -->
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock Classes="cover" Text="{Binding CoverText}" TextAlignment="Right"/>
+                                            <Border Classes="rule-mark" Classes.current="{Binding IsCurrent}"
+                                                    Classes.ended="{Binding IsEnded}"
+                                                    Classes.nextday="{Binding IsNextDay}"
+                                                    IsVisible="{Binding ShowMark}"
+                                                    HorizontalAlignment="Right">
+                                                <TextBlock Text="{Binding MarkText}"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <!-- 删除 -->
+                                        <Button Grid.Column="3" Classes="icon-btn danger" IsVisible="{Binding IsEditing}" Command="{Binding DeleteCommand}"
+                                                ToolTip.Tip="删除时段" VerticalAlignment="Center">
+                                            <PathIcon Data="{StaticResource IconTrash}"/>
+                                        </Button>
+                                        <!-- 浏览时只有主题区域可选，时间列始终位于点击区域之外。 -->
+                                        <Button Grid.Column="1" Grid.ColumnSpan="3" HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch" IsVisible="{Binding !IsEditing}"
+                                                Cursor="Hand" Click="SelectTheme" ToolTip.Tip="点击切换到此主题"
+                                                AutomationProperties.Name="{Binding ThemeName, StringFormat='切换到{0}'}">
+                                            <Button.Template>
+                                                <ControlTemplate><Border Background="Transparent"/></ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock IsVisible="{Binding IsEditing}" Classes="dn-sub" Text="{Binding ValidateText}"
+                               TextWrapping="Wrap" Margin="12,12,12,0"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

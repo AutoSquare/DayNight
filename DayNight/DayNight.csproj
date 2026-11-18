@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>DayNight</RootNamespace>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\daynight.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Authors>Jhonie King</Authors>
+    <Company>AutoSquare</Company>
+    <Copyright>Copyright (c) 2026 Jhonie King (AutoSquare)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Product>晨昏线 DayNight</Product>
+    <AssemblyTitle>晨昏线</AssemblyTitle>
+    <Description>按每日时段自动切换整套 Windows 主题，支持全屏延迟和托盘控制。</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE" Link="LICENSE" CopyToPublishDirectory="PreserveNewest" />
+    <AssemblyMetadata Include="Author" Value="$(Authors)" />
+    <None Include="..\licenses\**\*" Link="licenses\%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+    <AvaloniaResource Include="Assets\**" Exclude="Assets\avalonia-logo.ico" />
+    <Compile Remove="App.Diagnostics.cs;SmokeTestRunner.cs" Condition="'$(Configuration)' == 'Release'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.4" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" Condition="'$(Configuration)' == 'Debug'">
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="8.0.0" />
+  </ItemGroup>
+</Project>

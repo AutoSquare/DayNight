@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DayNight.Views.ThemeLibraryPageView">
+
+    <UserControl.Styles>
+        <Style Selector="Button.page-help">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="4"/>
+        </Style>
+        <Style Selector="Button.page-help PathIcon">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText3Brush}"/>
+        </Style>
+        <Style Selector="Button.page-help:pointerover PathIcon">
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="Border.theme-card">
+            <Setter Property="Background" Value="{DynamicResource DnCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource DnStrokeBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Margin" Value="7,0,7,14"/>
+            <Setter Property="ClipToBounds" Value="True"/>
+        </Style>
+        <Style Selector="Border.theme-card:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="BoxShadow" Value="0 4 12 0 #20000000"/>
+        </Style>
+        <Style Selector="Border.theme-card.current">
+            <Setter Property="BorderBrush" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="BoxShadow" Value="0 0 0 1 #31397E"/>
+        </Style>
+        <Style Selector="Border.theme-badge">
+            <Setter Property="Background" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="Padding" Value="9,2"/>
+            <Setter Property="CornerRadius" Value="999"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Margin" Value="8,8,0,0"/>
+        </Style>
+        <Style Selector="Border.theme-badge TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="10.5"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer>
+        <StackPanel Spacing="14">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Classes="dn-title" Text="主题库"/>
+                <Button Classes="page-help" Click="ShowHelp" ToolTip.Tip="本页说明">
+                    <PathIcon Data="{StaticResource IconQuestion}" Width="18" Height="18"/>
+                </Button>
+            </StackPanel>
+
+            <Border Classes="dn-card">
+                <StackPanel Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Grid.Column="0" Text="Windows 已安装的主题" FontWeight="SemiBold" FontSize="14.5"
+                                   Foreground="{DynamicResource DnTextBrush}" VerticalAlignment="Center"/>
+                        <Button Grid.Column="1" Classes="dn-btn" Command="{Binding RescanCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="7">
+                                <PathIcon Data="{StaticResource IconArrowClockwise}" Width="15" Height="15"/>
+                                <TextBlock Text="重新扫描"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <TextBlock Classes="dn-sub" Text="{Binding CountText}"/>
+                    <ItemsControl ItemsSource="{Binding ThemeItems}" Margin="-7,0,-7,-14">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Classes="theme-card" Classes.current="{Binding IsCurrent}" Tapped="ThemeCardTapped" Cursor="Hand" ToolTip.Tip="{Binding Name}">
+                                    <StackPanel>
+                                        <Panel Height="92">
+                                            <Image Source="{Binding Thumb}" Stretch="UniformToFill"/>
+                                            <Border Background="{Binding ThumbBrush}" IsVisible="{Binding !HasThumb}"
+                                                    Height="92"/>
+                                            <Border Classes="theme-badge" IsVisible="{Binding IsCurrent}">
+                                                <TextBlock Text="当前使用"/>
+                                            </Border>
+                                        </Panel>
+                                        <Grid ColumnDefinitions="*,Auto" Margin="12,9,12,10">
+                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"
+                                                       Foreground="{DynamicResource DnTextBrush}" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding CountText}" FontSize="11"
+                                                       Foreground="{DynamicResource DnText2Brush}"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

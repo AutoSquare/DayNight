@@ -1,0 +1,199 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DayNight.Views.MainWindow"
+        Title="晨昏线"
+        Icon="/Assets/daynight.ico"
+        Width="1080" Height="640" MinWidth="920" MinHeight="600"
+        ExtendClientAreaToDecorationsHint="True" WindowDecorations="BorderOnly"
+        ExtendClientAreaTitleBarHeightHint="40"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="Grid.dialog-background">
+            <Setter Property="Effect"><BlurEffect Radius="2"/></Setter>
+            <Setter Property="IsEnabled" Value="False"/>
+        </Style>
+        <Style Selector="Button.caption-button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.caption-button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="Button.caption-close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#C42B1C"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <!-- 导航 ListBox：透明背景、无边框滚动 -->
+        <Style Selector="ListBox.nav-list">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <!-- 导航项：圆角 hover/选中底、左竖条高亮 -->
+        <Style Selector="ListBoxItem.nav-item">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinHeight" Value="40"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Panel>
+                        <Border Name="PART_Bg" CornerRadius="6" Background="Transparent"/>
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          Margin="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Stretch"
+                                          RecognizesAccessKey="True"/>
+                    </Panel>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:pointerover /template/ Border#PART_Bg">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:selected /template/ Border#PART_Bg">
+            <Setter Property="Background" Value="{DynamicResource DnNavActiveBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item TextBlock.nav-text">
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:pointerover TextBlock.nav-text">
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:selected TextBlock.nav-text">
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item PathIcon.nav-ico">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText3Brush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:pointerover PathIcon.nav-ico">
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:selected PathIcon.nav-ico">
+            <Setter Property="Foreground" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+        <Style Selector="Rectangle.nav-bar">
+            <Setter Property="Width" Value="3"/>
+            <Setter Property="Fill" Value="Transparent"/>
+            <Setter Property="RadiusX" Value="2"/>
+            <Setter Property="RadiusY" Value="2"/>
+            <Setter Property="Margin" Value="0,10"/>
+        </Style>
+        <Style Selector="ListBoxItem.nav-item:selected Rectangle.nav-bar">
+            <Setter Property="Fill" Value="{DynamicResource DnAccentBrush}"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Background="{DynamicResource DnWinBgBrush}" RowDefinitions="40,*">
+        <Grid Classes.dialog-background="{Binding #SwitchOverlay.IsVisible}" ColumnDefinitions="*,Auto" Background="Transparent" PointerPressed="TitleBarPressed" DoubleTapped="TitleBarDoubleTapped">
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="14,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                <Image x:Name="TitleBarLogo" Width="20" Height="20"/>
+                <TextBlock Text="晨昏线" FontSize="12.5" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Classes="caption-button" Click="ShowHelp" ToolTip.Tip="使用说明">
+                    <Border Width="24" Height="24" CornerRadius="12" Background="{DynamicResource DnAccentBrush}">
+                        <PathIcon Data="{StaticResource IconQuestion}" Width="16" Height="16" Foreground="White"/>
+                    </Border>
+                </Button>
+                <Button Classes="caption-button" Click="MinimizeWindow" ToolTip.Tip="最小化">
+                    <TextBlock Text="—" FontSize="12" Foreground="{DynamicResource DnText2Brush}"/>
+                </Button>
+                <Button Classes="caption-button" Click="MaximizeWindow" ToolTip.Tip="最大化或还原">
+                    <Path Data="{StaticResource IconWinMax}" Width="11" Height="11" Stretch="Uniform" Stroke="{DynamicResource DnText2Brush}" StrokeThickness="1"/>
+                </Button>
+                <Button Classes="caption-button caption-close" Click="CloseWindow" ToolTip.Tip="退出">
+                    <Path Data="{StaticResource IconWinClose}" Width="12" Height="12" Stretch="Uniform" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="196,*" Classes.dialog-background="{Binding #SwitchOverlay.IsVisible}">
+
+            <!-- 左侧导航（独立区域：ListBox 单选驱动 CurrentPageIndex） -->
+            <Grid Grid.Column="0" Margin="8,8,8,12" RowDefinitions="Auto,Auto,*,Auto">
+                <ListBox Classes="nav-list" SelectedIndex="{Binding CurrentPageIndex}">
+                    <ListBoxItem Classes="nav-item">
+                        <Grid ColumnDefinitions="12,18,12,*">
+                            <Rectangle Grid.Column="0" Classes="nav-bar"/>
+                            <PathIcon Grid.Column="1" Classes="nav-ico" Data="{StaticResource IconClock}"/>
+                            <TextBlock Grid.Column="3" Classes="nav-text" Text="今日时间轴" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ListBoxItem>
+                    <ListBoxItem Classes="nav-item">
+                        <Grid ColumnDefinitions="12,18,12,*">
+                            <Rectangle Grid.Column="0" Classes="nav-bar"/>
+                            <PathIcon Grid.Column="1" Classes="nav-ico" Data="{StaticResource IconCalendar}"/>
+                            <TextBlock Grid.Column="3" Classes="nav-text" Text="时段规则" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ListBoxItem>
+                    <ListBoxItem Classes="nav-item">
+                        <Grid ColumnDefinitions="12,18,12,*">
+                            <Rectangle Grid.Column="0" Classes="nav-bar"/>
+                            <PathIcon Grid.Column="1" Classes="nav-ico" Data="{StaticResource IconImages}"/>
+                            <TextBlock Grid.Column="3" Classes="nav-text" Text="主题库" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ListBoxItem>
+                    <ListBoxItem Classes="nav-item">
+                        <Grid ColumnDefinitions="12,18,12,*">
+                            <Rectangle Grid.Column="0" Classes="nav-bar"/>
+                            <PathIcon Grid.Column="1" Classes="nav-ico" Data="{StaticResource IconSettings}"/>
+                            <TextBlock Grid.Column="3" Classes="nav-text" Text="设置" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ListBoxItem>
+                </ListBox>
+
+                <Border Grid.Row="1" Height="1" Background="{DynamicResource DnStrokeBrush}" Margin="10,8"/>
+                <StackPanel Grid.Row="3" Margin="12,8" Spacing="5">
+                    <TextBlock FontSize="11.5" Foreground="{DynamicResource DnText3Brush}" Text="{Binding ProductVersionText}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Ellipse Width="7" Height="7" Fill="{DynamicResource DnSunBrush}"/>
+                        <TextBlock FontSize="11.5" Foreground="{DynamicResource DnText3Brush}"
+                                   Text="{Binding FootStateText}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- 内容区：ContentControl + ViewLocator，当前页 VM → 对应视图，无叠层 -->
+            <Border Grid.Column="1" Margin="10,12,22,20" ClipToBounds="False">
+                <ContentControl Content="{Binding CurrentPage}" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            </Border>
+        </Grid>
+        <Grid x:Name="SwitchOverlay" Grid.RowSpan="2" IsVisible="False"
+              KeyboardNavigation.TabNavigation="Cycle" KeyDown="ConfirmKeyDown">
+            <Border Background="#59000000" PointerPressed="DismissBackdrop"/>
+            <Border Width="370" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Background="{DynamicResource DnCardSolidBrush}" BorderBrush="{DynamicResource DnStrokeBrush}"
+                    BorderThickness="1" CornerRadius="8" BoxShadow="0 12 32 0 #50000000" ClipToBounds="True">
+                <StackPanel>
+                    <TextBlock Text="切换主题" FontSize="17" FontWeight="SemiBold" Margin="22,18,22,6"/>
+                    <StackPanel Margin="22,0,22,18" Spacing="3">
+                        <TextBlock FontSize="13.5" TextWrapping="Wrap"><Run Text="是否现在就切换到「"/><Run x:Name="ConfirmThemeName" FontWeight="SemiBold"/><Run Text="」？"/></TextBlock>
+                        <TextBlock x:Name="ConfirmDetails" Classes="dn-sub" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="ConfirmNote" Classes="dn-sub" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Border Background="{DynamicResource DnNavActiveBrush}" Padding="22,14"
+                            BorderBrush="{DynamicResource DnStrokeBrush}" BorderThickness="0,1,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                            <Button x:Name="CancelSwitch" Classes="dn-btn" Content="取消" Click="DismissSwitch"/>
+                            <Button Classes="dn-btn primary" Content="立即切换" Click="AcceptSwitch"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
+

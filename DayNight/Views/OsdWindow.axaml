@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DayNight.Views.OsdWindow"
+        Title="晨昏线提示"
+        Width="400" Height="266" SizeToContent="Height" CanResize="False"
+        WindowDecorations="None" ShowInTaskbar="False" ShowActivated="False"
+        Topmost="True" Background="Transparent"
+        TransparencyLevelHint="Transparent" TransparencyBackgroundFallback="Transparent">
+
+    <Grid>
+      <Border x:Name="Card" ClipToBounds="True" CornerRadius="14"
+              Background="{DynamicResource DnOsdSurfaceBrush}" Padding="1">
+        <StackPanel>
+            <Panel Height="110">
+                <Image x:Name="ThumbImage" Stretch="UniformToFill"/>
+            </Panel>
+            <StackPanel Margin="18,14,18,16" Spacing="6">
+                <TextBlock Text="— 即将切换主题 —" HorizontalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource DnText2Brush}" Margin="0,0,0,4"/>
+                <TextBlock x:Name="ThemeNameText" HorizontalAlignment="Center"
+                           FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource DnTextBrush}"/>
+                <TextBlock x:Name="CountText" HorizontalAlignment="Center"
+                           FontSize="13" Foreground="{DynamicResource DnTextBrush}" Margin="0,4,0,8"/>
+                <ProgressBar x:Name="Progress" Value="100" Maximum="100" Height="4"
+                             CornerRadius="2" Foreground="{DynamicResource DnAccentBrush}" Background="{DynamicResource DnStrokeBrush}"/>
+                <TextBlock Text="鼠标点击可穿透，托盘菜单可跳过本次" HorizontalAlignment="Center"
+                           FontSize="10.5" Foreground="{DynamicResource DnText2Brush}" Margin="0,6,0,0"/>
+            </StackPanel>
+        </StackPanel>
+      </Border>
+      <Path x:Name="Outline" Stretch="None" Fill="{DynamicResource DnOsdOutlineBrush}" IsHitTestVisible="False"/>
+    </Grid>
+</Window>

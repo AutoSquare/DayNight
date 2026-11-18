@@ -1,0 +1,150 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:DayNight"
+             x:Class="DayNight.App"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- 覆盖系统强调色：统一为 Logo 藏青（Fluent 运行时从顶层读取） -->
+            <Color x:Key="SystemAccentColor">#31397E</Color>
+            <Color x:Key="SystemAccentColorLight1">#4A55A8</Color>
+            <Color x:Key="SystemAccentColorLight2">#6B76C4</Color>
+            <Color x:Key="SystemAccentColorDark1">#262D68</Color>
+            <Color x:Key="SystemAccentColorDark2">#1C2252</Color>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="DnTextBrush" Color="#1B1B1B"/>
+                    <SolidColorBrush x:Key="DnText2Brush" Color="#5D5D5D"/>
+                    <SolidColorBrush x:Key="DnText3Brush" Color="#8A8A8A"/>
+                    <SolidColorBrush x:Key="DnStrokeBrush" Color="#17000000"/>
+                    <SolidColorBrush x:Key="DnCardBrush" Color="#B8FFFFFF"/>
+                    <SolidColorBrush x:Key="DnCardSolidBrush" Color="#FDFDFE"/>
+                    <SolidColorBrush x:Key="DnOsdSurfaceBrush" Color="#F2F7F8FC"/>
+                    <SolidColorBrush x:Key="DnOsdOutlineBrush" Color="#8490A3"/>
+                    <SolidColorBrush x:Key="DnNavActiveBrush" Color="#0E000000"/>
+                    <SolidColorBrush x:Key="DnAccentBrush" Color="#31397E"/>
+                    <SolidColorBrush x:Key="DnAccentHoverBrush" Color="#262D68"/>
+                    <SolidColorBrush x:Key="DnSunBrush" Color="#F5A623"/>
+                    <LinearGradientBrush x:Key="DnWinBgBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#F6F7FB" Offset="0"/>
+                        <GradientStop Color="#E9ECF4" Offset="1"/>
+                    </LinearGradientBrush>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="DnTextBrush" Color="#F2F2F2"/>
+                    <SolidColorBrush x:Key="DnText2Brush" Color="#B6B6B6"/>
+                    <SolidColorBrush x:Key="DnText3Brush" Color="#8B8B8B"/>
+                    <SolidColorBrush x:Key="DnStrokeBrush" Color="#17FFFFFF"/>
+                    <SolidColorBrush x:Key="DnCardBrush" Color="#B82B2D34"/>
+                    <SolidColorBrush x:Key="DnCardSolidBrush" Color="#2B2D34"/>
+                    <SolidColorBrush x:Key="DnOsdSurfaceBrush" Color="#EF262832"/>
+                    <SolidColorBrush x:Key="DnOsdOutlineBrush" Color="#626B7D"/>
+                    <SolidColorBrush x:Key="DnNavActiveBrush" Color="#12FFFFFF"/>
+                    <SolidColorBrush x:Key="DnAccentBrush" Color="#9AA5FF"/>
+                    <SolidColorBrush x:Key="DnAccentHoverBrush" Color="#AEB6FF"/>
+                    <SolidColorBrush x:Key="DnSunBrush" Color="#F5A623"/>
+                    <LinearGradientBrush x:Key="DnWinBgBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#1F2229" Offset="0"/>
+                        <GradientStop Color="#171A20" Offset="1"/>
+                    </LinearGradientBrush>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- 导航与操作图标（Fluent UI System Icons，MIT） -->
+            <StreamGeometry x:Key="IconClock">M3.5 12a8.5 8.5 0 1 1 17 0 8.5 8.5 0 0 1-17 0M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 4.65a.75.75 0 0 0-1.5.1v6.1c.06.37.37.65.75.65h4.1a.75.75 0 0 0-.1-1.5H12V6.65</StreamGeometry>
+            <StreamGeometry x:Key="IconCalendar">M17.75 3C19.55 3 21 4.46 21 6.25v11.5c0 1.8-1.46 3.25-3.25 3.25H6.25A3.25 3.25 0 0 1 3 17.75V6.25C3 4.45 4.46 3 6.25 3zm1.75 5.5h-15v9.25c0 .97.78 1.75 1.75 1.75h11.5c.97 0 1.75-.78 1.75-1.75zm-11.75 6a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5m4.25 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5m-4.25-4a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5m4.25 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5m4.25 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5m1.5-6H6.25c-.97 0-1.75.78-1.75 1.75V7h15v-.75c0-.97-.78-1.75-1.75-1.75</StreamGeometry>
+            <StreamGeometry x:Key="IconImages">M13.75 9a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5m-7.5-6A3.25 3.25 0 0 0 3 6.25v9c0 1.8 1.46 3.25 3.25 3.25h9c1.8 0 3.25-1.46 3.25-3.25v-9c0-1.8-1.46-3.25-3.25-3.25zM4.5 6.25c0-.97.78-1.75 1.75-1.75h9c.97 0 1.75.78 1.75 1.75v9q0 .35-.13.65l-4.58-4.29c-.87-.8-2.21-.8-3.08 0l-4.58 4.3q-.13-.3-.13-.66zm6.76 6.46 4.5 4.21q-.24.08-.51.08h-9q-.27 0-.52-.08l4.5-4.21a.75.75 0 0 1 1.03 0M8.75 21c-1.15 0-2.16-.6-2.74-1.5h9.74a3.75 3.75 0 0 0 3.75-3.75V6.01c.9.58 1.5 1.59 1.5 2.74v7c0 2.9-2.35 5.25-5.25 5.25z</StreamGeometry>
+            <StreamGeometry x:Key="IconSettings">M12.01 2.25q1.11.01 2.18.25c.32.07.55.33.59.65l.17 1.53a1.38 1.38 0 0 0 1.92 1.11l1.4-.61c.3-.13.64-.06.85.17a10 10 0 0 1 2.2 3.8c.1.3 0 .63-.26.82l-1.25.92a1.38 1.38 0 0 0 0 2.22l1.25.92c.26.19.36.52.27.82a10 10 0 0 1-2.2 3.8.75.75 0 0 1-.85.17l-1.4-.62a1.38 1.38 0 0 0-1.93 1.12l-.17 1.52a.75.75 0 0 1-.58.65 9.5 9.5 0 0 1-4.4 0 .75.75 0 0 1-.57-.65l-.17-1.52a1.38 1.38 0 0 0-1.93-1.11l-1.4.62a.75.75 0 0 1-.85-.18 10 10 0 0 1-2.2-3.8c-.1-.3 0-.63.26-.82l1.25-.92a1.38 1.38 0 0 0 0-2.22l-1.24-.92a.75.75 0 0 1-.28-.82 10 10 0 0 1 2.2-3.8c.23-.23.57-.3.86-.17l1.4.62c.4.17.86.15 1.25-.08.38-.22.63-.6.68-1.04l.17-1.53a.75.75 0 0 1 .58-.65q1.08-.24 2.2-.25m0 1.5q-.67 0-1.35.12l-.11.97a2.9 2.9 0 0 1-4.03 2.33l-.9-.4A8 8 0 0 0 4.29 9.1l.8.59a2.88 2.88 0 0 1 0 4.64l-.8.59a8 8 0 0 0 1.35 2.32l.9-.4a2.88 2.88 0 0 1 4.02 2.32l.1.99q1.35.22 2.7 0l.1-.99a2.88 2.88 0 0 1 4.02-2.32l.9.4a8 8 0 0 0 1.35-2.32l-.8-.59a2.88 2.88 0 0 1 0-4.64l.8-.59a8 8 0 0 0-1.35-2.32l-.9.4q-.55.24-1.15.24c-1.47 0-2.7-1.1-2.86-2.57l-.11-.97q-.68-.11-1.34-.12M12 8.25a3.75 3.75 0 1 1 0 7.5 3.75 3.75 0 0 1 0-7.5m0 1.5a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5</StreamGeometry>
+            <StreamGeometry x:Key="IconQuestion">M12 4a5 5 0 0 0-5 5 .75.75 0 0 0 1.5 0 3.5 3.5 0 1 1 7 0c0 .85-.22 1.42-.53 1.86a6 6 0 0 1-1.44 1.34c-1 .77-2.28 1.73-2.28 3.8v.25a.75.75 0 0 0 1.5 0V16c0-1.32.71-1.86 1.79-2.68l.04-.04c.53-.4 1.15-.88 1.62-1.56A5 5 0 0 0 12 4m0 17a1 1 0 1 0 0-2 1 1 0 0 0 0 2</StreamGeometry>
+            <StreamGeometry x:Key="IconSwap">m14.78 2.22 4.5 4.5c.26.26.29.68.07.97l-.07.08-4.5 4.5a.75.75 0 0 1-1.13-.97l.07-.08L16.94 8H5.24a.75.75 0 0 1-.74-.65v-.1c0-.38.27-.7.64-.75h11.8l-3.22-3.22a.75.75 0 0 1-.07-.98l.07-.08a.75.75 0 0 1 .98-.07zl4.5 4.5zm4.72 14.43v.1c0 .38-.28.7-.64.74l-.1.01H7.06l3.22 3.22c.27.27.3.68.08.98l-.08.08a.75.75 0 0 1-.97.07l-.09-.07-4.5-4.5a.75.75 0 0 1-.07-.97l.07-.09 4.5-4.5a.75.75 0 0 1 1.14.98l-.08.08L7.07 16h11.69c.38 0 .7.28.74.65v.1z</StreamGeometry>
+            <StreamGeometry x:Key="IconArrowClockwise">M12 4.5a7.5 7.5 0 1 0 7.42 6.4c-.07-.46.26-.9.72-.9.37 0 .7.26.76.62q.1.67.1 1.38a9 9 0 1 1-3-6.7V4.24a.75.75 0 0 1 1.5 0v3c0 .41-.34.75-.75.75h-3a.75.75 0 0 1 0-1.5h1.35a7.5 7.5 0 0 0-5.1-2</StreamGeometry>
+            <StreamGeometry x:Key="IconFolderOpen">M3.5 6.25c0-.97.78-1.75 1.75-1.75h2.88q.31 0 .53.22l2.06 2.06q.22.22.53.22h5.5c.97 0 1.75.78 1.75 1.75q0 .13.04.25H8.72c-1.34 0-2.58.71-3.25 1.87L3.5 14.28zM2 17.79A3.25 3.25 0 0 0 5.25 21h11.04c1.33 0 2.57-.72 3.24-1.88l3.03-5.25A3.25 3.25 0 0 0 19.96 9a1 1 0 0 0 .04-.25c0-1.8-1.45-3.25-3.25-3.25h-5.19L9.72 3.66c-.42-.42-1-.66-1.6-.66H5.26A3.25 3.25 0 0 0 2 6.25v11.54m6.72-7.3h11.03a1.75 1.75 0 0 1 1.51 2.63l-3.03 5.25c-.4.7-1.14 1.13-1.95 1.13H5.25a1.75 1.75 0 0 1-1.51-2.63l3.03-5.25c.4-.7 1.14-1.12 1.95-1.12</StreamGeometry>
+            <StreamGeometry x:Key="IconTrash">M10 5H14C14 3.9 13.1 3 12 3C10.9 3 10 3.9 10 5ZM8.5 5C8.5 3.07 10.07 1.5 12 1.5C13.93 1.5 15.5 3.07 15.5 5H21.25C21.66 5 22 5.34 22 5.75C22 6.16 21.66 6.5 21.25 6.5H19.93L18.76 18.61C18.57 20.53 16.96 22 15.03 22H8.97C7.04 22 5.43 20.53 5.24 18.61L4.07 6.5H2.75C2.34 6.5 2 6.16 2 5.75C2 5.34 2.34 5 2.75 5H8.5ZM10.5 9.75C10.5 9.34 10.16 9 9.75 9C9.34 9 9 9.34 9 9.75V17.25C9 17.66 9.34 18 9.75 18C10.16 18 10.5 17.66 10.5 17.25V9.75ZM14.25 9C14.66 9 15 9.34 15 9.75V17.25C15 17.66 14.25 18 14.25 18C13.84 18 13.5 17.66 13.5 17.25V9.75C13.5 9.34 13.84 9 14.25 9ZM6.73 18.47C6.85 19.62 7.82 20.5 8.97 20.5H15.03C16.19 20.5 17.15 19.62 17.27 18.47L18.42 6.5H5.58L6.73 18.47Z</StreamGeometry>
+            <StreamGeometry x:Key="IconArrowForward">M14.72 6.28a.75.75 0 0 1 1.06-1.06l5 5c.3.3.3.77 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06l3.72-3.72h-7.69a6.25 6.25 0 0 0-6.25 6.25v.5a.75.75 0 0 1-1.5 0v-.5A7.75 7.75 0 0 1 10.75 10h7.69z</StreamGeometry>
+            <StreamGeometry x:Key="IconWinMin">M5 12h14</StreamGeometry>
+            <StreamGeometry x:Key="IconWinMax">M5.5 5.5h13v13h-13z</StreamGeometry>
+            <StreamGeometry x:Key="IconWinClose">M6 6l12 12M18 6L6 18</StreamGeometry>
+
+            <!-- 色带渐变（壁纸预览缺失时兜底，与原型 6 色一致） -->
+            <LinearGradientBrush x:Key="BandGrad0" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#1A2350" Offset="0"/><GradientStop Color="#3C2F6E" Offset="0.6"/><GradientStop Color="#8A5AA8" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGrad1" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#F0A56A" Offset="0"/><GradientStop Color="#E57B5C" Offset="0.55"/><GradientStop Color="#8F4F8F" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGrad2" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#57B3F0" Offset="0"/><GradientStop Color="#2F7FD4" Offset="0.55"/><GradientStop Color="#1D5AA0" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGrad3" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#F27A4D" Offset="0"/><GradientStop Color="#C24467" Offset="0.6"/><GradientStop Color="#5E3A8C" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGrad4" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#0E2A3A" Offset="0"/><GradientStop Color="#1C6E5E" Offset="0.55"/><GradientStop Color="#7FD8A8" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGrad5" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#F7C6D9" Offset="0"/><GradientStop Color="#E59AB8" Offset="0.55"/><GradientStop Color="#9A6AA0" Offset="1"/>
+            </LinearGradientBrush>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme/>
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+        </Style>
+        <Style Selector="ToggleSwitch">
+            <Setter Property="OnContent" Value=""/>
+            <Setter Property="OffContent" Value=""/>
+            <Setter Property="MinWidth" Value="40"/>
+            <Setter Property="Width" Value="40"/>
+        </Style>
+        <Style Selector="Button.page-help">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="MinHeight" Value="26"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.page-help PathIcon">
+            <Setter Property="Width" Value="18"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText3Brush}"/>
+        </Style>
+        <Style Selector="Border.dn-card">
+            <Setter Property="Background" Value="{DynamicResource DnCardBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource DnStrokeBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="18,16"/>
+        </Style>
+        <Style Selector="TextBlock.dn-title">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+        </Style>
+        <Style Selector="TextBlock.dn-sub">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
+        </Style>
+        <Style Selector="Button.dn-btn">
+            <Setter Property="Background" Value="{DynamicResource DnCardBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource DnStrokeBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="MinHeight" Value="32"/>
+        </Style>
+        <Style Selector="Button.dn-btn.primary">
+            <Setter Property="Background" Value="{DynamicResource DnAccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+    </Application.Styles>
+</Application>
