@@ -5,13 +5,15 @@ using Avalonia.Styling;
 
 namespace DayNight.Views;
 
+internal enum CloseChoice { Cancel, MinimizeToTray, Exit }
+
 /// <summary>
-/// 帮助说明与未保存计划的对话框。
+/// 主窗口的帮助、关闭选择与未保存计划对话框。
 /// 纯代码构造，避免为每种弹窗建独立 axaml。
 /// </summary>
 public static class Dialogs
 {
-    private static Window BuildShell(string title, out StackPanel bodyHost, out Button confirmButton,
+    private static Window BuildShell(string title, out StackPanel bodyHost, out Button confirmButton, out StackPanel foot,
         string confirmText, bool showCancel)
     {
         var titleBlock = new TextBlock
@@ -29,14 +31,14 @@ public static class Dialogs
             Content = confirmText,
             Classes = { "dn-btn", "primary" },
         };
-        var foot = new StackPanel
+        foot = new StackPanel
         {
             Orientation = Avalonia.Layout.Orientation.Horizontal,
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
             Spacing = 10,
             Margin = new Thickness(22, 12),
         };
-        Button? cancelButton = showCancel ? new Button { Content = "取消", Classes = { "dn-btn" } } : null;
+        Button? cancelButton = showCancel ? new Button { Content = "取消", IsCancel = true, Classes = { "dn-btn" } } : null;
         if (cancelButton is not null) foot.Children.Add(cancelButton);
         foot.Children.Add(confirmButton);
 
@@ -51,6 +53,7 @@ public static class Dialogs
 
         var shell = new Window
         {
+            Title = title,
             WindowDecorations = WindowDecorations.None,
             TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent },
             TransparencyBackgroundFallback = BrushHelper.CardBrush, // 透明不可用时退化为卡片底色，绝不发黑
@@ -63,8 +66,6 @@ public static class Dialogs
             Content = card, // 窗口即卡片：无边框、无黑底、无遮罩
         };
 
-        // 点确认/取消一律关闭（此前 Help 漏绑导致"知道了"关不掉）
-        confirmButton.Click += (_, _) => shell.Close();
         if (cancelButton is not null) cancelButton.Click += (_, _) => shell.Close();
         return shell;
     }
@@ -72,7 +73,8 @@ public static class Dialogs
     /// <summary>帮助说明窗：加粗小标题 + 正文的分节说明。</summary>
     public static Window Help(Window owner, string title, params (string Head, string Text)[] sections)
     {
-        var shell = BuildShell(title, out var body, out var confirmButton, "知道了", showCancel: false);
+        var shell = BuildShell(title, out var body, out var confirmButton, out _, "知道了", showCancel: false);
+        confirmButton.Click += (_, _) => shell.Close();
         foreach (var (head, text) in sections)
         {
             body.Children.Add(new TextBlock
@@ -99,15 +101,28 @@ public static class Dialogs
     /// <summary>离开应用时明确处理未保存草稿，保存失败保留主窗口。</summary>
     public static void UnsavedPlan(Window owner, Action save, Action discard, Action closed)
     {
-        var shell = BuildShell("计划尚未保存", out var body, out var confirm, "保存并退出", showCancel: true);
+        var shell = BuildShell("计划尚未保存", out var body, out var confirm, out _, "保存并退出", showCancel: true);
         body.Children.Add(new TextBlock { Text = "修改还没有生效。退出前是否保存切换计划？", TextWrapping = TextWrapping.Wrap });
         var discardButton = new Button { Content = "不保存退出", Classes = { "dn-btn" } };
         body.Children.Add(discardButton);
-        confirm.Click += (_, _) => save();
+        confirm.Click += (_, _) => { shell.Close(); save(); };
         discardButton.Click += (_, _) => { shell.Close(); discard(); };
         shell.Closed += (_, _) => closed();
         CenterOnOwner(shell, owner);
         shell.ShowDialog(owner);
+    }
+
+    internal static Task<CloseChoice> ChooseCloseAction(Window owner)
+    {
+        var shell = BuildShell("关闭晨昏线", out var body, out var tray, out var foot, "最小化到托盘", showCancel: true);
+        body.Children.Add(new TextBlock { Text = "最小化后可继续按计划切换主题。退出程序将停止自动切换。", TextWrapping = TextWrapping.Wrap });
+        var exit = new Button { Content = "退出程序", Classes = { "dn-btn" } };
+        foot.Children.Insert(1, exit);
+        exit.Click += (_, _) => shell.Close(CloseChoice.Exit);
+        tray.Click += (_, _) => shell.Close(CloseChoice.MinimizeToTray);
+        shell.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+        shell.Opened += (_, _) => tray.Focus();
+        return shell.ShowDialog<CloseChoice>(owner);
     }
 
     private static void CenterOnOwner(Window shell, Window owner)

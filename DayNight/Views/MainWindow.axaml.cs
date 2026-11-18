@@ -66,7 +66,7 @@ public partial class MainWindow : Window
         PropertyChanged += OnWindowStateChanged;
         Opened += (_, _) => UpdateTitleIcon();
         ScalingChanged += (_, _) => UpdateTitleIcon();
-        Closing += OnClosingWithDraft;
+        Closing += OnWindowClosing;
         Closed += (_, _) => _titleIcon?.Dispose();
     }
 
@@ -78,16 +78,45 @@ public partial class MainWindow : Window
         previous?.Dispose();
     }
 
-    private void OnClosingWithDraft(object? sender, WindowClosingEventArgs e)
+    private async void OnWindowClosing(object? sender, WindowClosingEventArgs e)
     {
-        if (_allowClose || DataContext is not DayNight.ViewModels.MainViewModel vm || !vm.Rules.HasPendingChanges) return;
+        if (_allowClose || e.CloseReason is WindowCloseReason.OSShutdown or WindowCloseReason.ApplicationShutdown
+            || DataContext is not DayNight.ViewModels.MainViewModel vm) return;
+        if (!_closingPromptOpen && !vm.Settings.MinimizeToTray && !vm.Rules.HasPendingChanges) return;
         e.Cancel = true;
         if (_closingPromptOpen) return;
+        if (vm.Settings.MinimizeToTray)
+        {
+            _closingPromptOpen = true;
+            CloseChoice choice;
+            try { choice = await Dialogs.ChooseCloseAction(this); }
+            finally { _closingPromptOpen = false; }
+            if (choice == CloseChoice.MinimizeToTray) Hide();
+            if (choice != CloseChoice.Exit) return;
+        }
+        RequestExit();
+    }
+
+    /// <summary>处理明确的退出请求，退出前让用户处理未保存的计划。</summary>
+    internal void RequestExit()
+    {
+        if (_closingPromptOpen) return;
+        if (DataContext is not DayNight.ViewModels.MainViewModel vm || !vm.Rules.HasPendingChanges)
+        {
+            ExitApplication();
+            return;
+        }
         _closingPromptOpen = true;
         Dialogs.UnsavedPlan(this,
-            save: () => { if (vm.Rules.SaveChanges(align: false)) { _allowClose = true; Close(); } },
-            discard: () => { _allowClose = true; Close(); },
+            save: () => { if (vm.Rules.SaveChanges(align: false)) ExitApplication(); },
+            discard: ExitApplication,
             closed: () => _closingPromptOpen = false);
+    }
+
+    private void ExitApplication()
+    {
+        _allowClose = true;
+        Close();
     }
 
     private void TitleBarPressed(object? sender, PointerPressedEventArgs e)
@@ -114,7 +143,7 @@ public partial class MainWindow : Window
         ("今日时间轴", "查看当前主题、全天安排和下一次切换时间。"),
         ("时段规则", "设置时段与主题；关闭自动切换后，重启和唤醒仍保持关闭。"),
         ("主题库", "读取 Windows 已保存的主题，点击卡片可以手动应用。"),
-        ("后台运行", "最小化可驻留托盘；关闭窗口会退出程序。"));
+        ("后台运行", "开启“最小化到托盘”后，点关闭可选择留在托盘或退出程序。"));
 
     private void OnWindowStateChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {

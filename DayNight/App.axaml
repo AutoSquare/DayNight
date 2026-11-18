@@ -133,6 +133,7 @@
             <Setter Property="Foreground" Value="{DynamicResource DnText2Brush}"/>
         </Style>
         <Style Selector="Button.dn-btn">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Background" Value="{DynamicResource DnCardBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource DnTextBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource DnStrokeBrush}"/>

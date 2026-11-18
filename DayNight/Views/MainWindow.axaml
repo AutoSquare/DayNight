@@ -115,7 +115,7 @@
                 <Button Classes="caption-button" Click="MaximizeWindow" ToolTip.Tip="最大化或还原">
                     <Path Data="{StaticResource IconWinMax}" Width="11" Height="11" Stretch="Uniform" Stroke="{DynamicResource DnText2Brush}" StrokeThickness="1"/>
                 </Button>
-                <Button Classes="caption-button caption-close" Click="CloseWindow" ToolTip.Tip="退出">
+                <Button Classes="caption-button caption-close" Click="CloseWindow" ToolTip.Tip="关闭">
                     <Path Data="{StaticResource IconWinClose}" Width="12" Height="12" Stretch="Uniform" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1"/>
                 </Button>
             </StackPanel>

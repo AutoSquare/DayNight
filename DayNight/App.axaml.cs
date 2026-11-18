@@ -42,8 +42,16 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             desktop.MainWindow = new MainWindow { DataContext = mainVm };
-            desktop.Exit += (_, _) => CleanupTray();
+            desktop.MainWindow.Closed += (_, _) =>
+            {
+                // 先断开托盘的窗口引用。关闭对话框和窗口事件返回后再结束消息循环。
+                desktop.MainWindow = null;
+                _tickTimer?.Stop();
+                CleanupTray();
+                Dispatcher.UIThread.Post(() => desktop.Shutdown(), DispatcherPriority.Send);
+            };
 #if DEBUG
             if (Program.StartPage is >= 0 and <= 3) mainVm.SelectPage(Program.StartPage);
 #endif
@@ -336,7 +344,7 @@ public partial class App : Application
         exitItem.Click += (_, _) =>
         {
             ShowMainWindow(desktop);
-            desktop.MainWindow?.Close();
+            if (desktop.MainWindow is MainWindow window) window.RequestExit();
         };
 
         var menu = new NativeMenu();

@@ -104,7 +104,7 @@
                     <Grid ColumnDefinitions="*,Auto" Margin="0,8">
                         <StackPanel Grid.Column="0">
                             <TextBlock Classes="set-title" Text="最小化到托盘"/>
-                            <TextBlock Classes="set-desc" Text="开启时点击最小化隐藏到托盘；关闭时最小化到任务栏、关闭按钮退出程序"/>
+                            <TextBlock Classes="set-desc" Text="开启后，点最小化会隐藏到托盘；点关闭可选择留在托盘或退出"/>
                         </StackPanel>
                         <ToggleSwitch Grid.Column="1" IsChecked="{Binding MinimizeToTray}"/>
                     </Grid>
