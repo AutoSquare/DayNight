@@ -32,12 +32,17 @@ public sealed class ScheduleBand : Control
         base.Render(context);
         if (ViewModel is not { } vm) return;
         var rows = vm.RuleItems;
-        using (context.PushClip(new RoundedRect(new Rect(Inset, TrackY, BarWidth, TrackHeight), 5)))
+        var track = new Rect(Inset, TrackY, BarWidth, TrackHeight);
+        using (context.PushClip(new RoundedRect(track, 5)))
         {
             foreach (var (index, start, end) in vm.DraftPlan.GetDaySlices())
             {
+                var width = BarWidth * (end - start) / 1440;
                 var x = Inset + BarWidth * start / 1440;
-                context.DrawRectangle(ThemeBrush.ForGradient(index), null, new Rect(x, TrackY, BarWidth * (end - start) / 1440, TrackHeight));
+                var gap = start == 0 ? 0 : Math.Min(2, width / 4);
+                var slice = new Rect(x + gap, TrackY, width - gap, TrackHeight);
+                var themeId = vm.DraftPlan.Segments[index].ThemeId;
+                context.DrawRectangle(ScheduleGradient.ForSlice(vm.DraftPlan, index, vm.LightnessOf(index), start, end, themeId), null, slice);
             }
         }
         for (var i = 0; vm.IsEditing && i < rows.Count; i++)

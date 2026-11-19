@@ -58,6 +58,15 @@ public partial class RulesPageViewModel : ViewModelBase
         Refresh();
     }
 
+    /// <summary>查询草稿段绑定主题的明暗（色带渐变取色用），未绑定或未知为 null。</summary>
+    public bool? LightnessOf(int segmentIndex)
+    {
+        if (segmentIndex < 0 || segmentIndex >= DraftPlan.Segments.Count) return null;
+        var id = DraftPlan.Segments[segmentIndex].ThemeId;
+        return _themes.FirstOrDefault(t => string.Equals(t.FilePath, id, StringComparison.OrdinalIgnoreCase))
+            ?.PreviewUsesLightTheme;
+    }
+
     /// <summary>刷新有效状态；不会用有效配置覆盖尚未保存的编辑。</summary>
     public void Refresh()
     {

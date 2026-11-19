@@ -70,7 +70,28 @@
             <StreamGeometry x:Key="IconWinMax">M5.5 5.5h13v13h-13z</StreamGeometry>
             <StreamGeometry x:Key="IconWinClose">M6 6l12 12M18 6L6 18</StreamGeometry>
 
-            <!-- 色带渐变（壁纸预览缺失时兜底，与原型 6 色一致） -->
+            <!-- 色带渐变（壁纸预览缺失时兜底）：按绑定主题明暗分族，同族内按段序号轮换取色 -->
+            <!-- 渐变跨两个色相（duotone），呼应“晨昏线”意象：亮族＝破晓（天光蓝→暖端），暗族＝入夜（深夜蓝→末端余晖/极光）。
+                 标签文字位于段左下（渐变起点一侧），起点色保证文字对比度。 -->
+            <LinearGradientBrush x:Key="BandGradLight0" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#A3CDF2" Offset="0"/><GradientStop Color="#BFE4F2" Offset="0.5"/><GradientStop Color="#FFD9A0" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGradLight1" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#FFDCA6" Offset="0"/><GradientStop Color="#FBC9B8" Offset="0.5"/><GradientStop Color="#EFACBE" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGradLight2" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#B7E8D5" Offset="0"/><GradientStop Color="#C7DDF2" Offset="0.5"/><GradientStop Color="#C9B8F0" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGradDark0" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#2A3157" Offset="0"/><GradientStop Color="#4C3E82" Offset="0.5"/><GradientStop Color="#805FB6" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGradDark1" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#262B52" Offset="0"/><GradientStop Color="#5C4380" Offset="0.5"/><GradientStop Color="#DA8F60" Offset="1"/>
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="BandGradDark2" StartPoint="0%,0%" EndPoint="100%,100%">
+                <GradientStop Color="#1C2B45" Offset="0"/><GradientStop Color="#2C5E78" Offset="0.5"/><GradientStop Color="#6FBFA8" Offset="1"/>
+            </LinearGradientBrush>
+            <!-- 中性族：主题明暗未知或段未绑定时兜底，与原型 6 色一致 -->
             <LinearGradientBrush x:Key="BandGrad0" StartPoint="0%,0%" EndPoint="100%,100%">
                 <GradientStop Color="#1A2350" Offset="0"/><GradientStop Color="#3C2F6E" Offset="0.6"/><GradientStop Color="#8A5AA8" Offset="1"/>
             </LinearGradientBrush>

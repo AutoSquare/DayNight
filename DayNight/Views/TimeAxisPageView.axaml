@@ -65,19 +65,21 @@
                     <TextBlock Text="全天时段分布" FontWeight="SemiBold" FontSize="14.5"
                                Foreground="{DynamicResource DnTextBrush}"/>
                     <!-- 色带 + 当前时刻指针（上行为指针时间标签预留） -->
-                    <Grid x:Name="BandWrap" RowDefinitions="22,64" Opacity="{Binding TimelineOpacity}">
-                        <Grid x:Name="BandHost" Grid.Row="1" MinHeight="64"/>
+                    <Grid x:Name="BandWrap" RowDefinitions="22,72" Opacity="{Binding TimelineOpacity}">
+                        <Border Grid.Row="1" CornerRadius="8" ClipToBounds="True">
+                            <Grid x:Name="BandHost" MinHeight="72"/>
+                        </Border>
                     </Grid>
-                    <Grid ColumnDefinitions="*,*,*,*,*">
+                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*">
                         <TextBlock Grid.Column="0" Text="00:00" FontSize="10.5"
                                    Foreground="{DynamicResource DnText3Brush}"/>
-                        <TextBlock Grid.Column="1" Text="06:00" FontSize="10.5"
-                                   Foreground="{DynamicResource DnText3Brush}"/>
-                        <TextBlock Grid.Column="2" Text="12:00" FontSize="10.5"
+                        <TextBlock Grid.Column="1" Grid.ColumnSpan="2" Text="06:00" FontSize="10.5"
                                    Foreground="{DynamicResource DnText3Brush}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="3" Text="18:00" FontSize="10.5"
+                        <TextBlock Grid.Column="3" Grid.ColumnSpan="2" Text="12:00" FontSize="10.5"
                                    Foreground="{DynamicResource DnText3Brush}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Column="4" Text="24:00" FontSize="10.5"
+                        <TextBlock Grid.Column="5" Grid.ColumnSpan="2" Text="18:00" FontSize="10.5"
+                                   Foreground="{DynamicResource DnText3Brush}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="7" Text="24:00" FontSize="10.5"
                                    Foreground="{DynamicResource DnText3Brush}" HorizontalAlignment="Right"/>
                     </Grid>
                 </StackPanel>

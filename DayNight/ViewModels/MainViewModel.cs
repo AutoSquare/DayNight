@@ -114,12 +114,14 @@ public partial class MainViewModel : ViewModelBase
     /// <summary>复用主题库已解码的缩略图，避免时间轴刷新时重复读取壁纸。</summary>
     /// <param name="themeId">主题文件路径。</param>
     /// <param name="fallbackIndex">无预览时的色带索引。</param>
-    /// <returns>壁纸画刷或占位渐变。</returns>
+    /// <returns>壁纸画刷或按主题明暗选取的占位渐变。</returns>
     public IBrush GetThemePreview(string themeId, int fallbackIndex)
     {
         var item = Library?.ThemeItems.FirstOrDefault(t => string.Equals(
             ThemeCatalogService.NormalizePath(t.FilePath), ThemeCatalogService.NormalizePath(themeId), StringComparison.OrdinalIgnoreCase));
-        return item?.Thumb is IImageBrushSource image ? new ImageBrush(image) { Stretch = Stretch.UniformToFill } : ThemeBrush.ForGradient(fallbackIndex);
+        return item?.Thumb is IImageBrushSource image
+            ? new ImageBrush(image) { Stretch = Stretch.UniformToFill }
+            : ThemeBrush.ForGradient(fallbackIndex, GetPreviewTheme(themeId)?.PreviewUsesLightTheme);
     }
 
     /// <summary>规则页行点击 → 手动切换（含保持到明天）；调用前 UI 层已弹确认。</summary>
@@ -287,6 +289,7 @@ public partial class TimeAxisPageViewModel : ViewModelBase
         foreach (var (i, start, endMinute) in _ctx.Schedule.GetDaySlices())
         {
             var mark = views[i].Mark;
+            var light = _main.GetPreviewTheme(segments[i].ThemeId)?.PreviewUsesLightTheme;
             // 午夜前后两块属于同一条规则，但代表不同日期开始的两次时段。
             if (i == segments.Count - 1 && segments[0].StartTime != TimeOnly.MinValue)
             {
@@ -298,9 +301,11 @@ public partial class TimeAxisPageViewModel : ViewModelBase
             BandItems.Add(new ColorBandItem
             {
                 WidthPercent = (endMinute - start) / total * 100,
-                BandBrush = ThemeBrush.ForGradient(i),
+                Light = light,
+                Fill = ScheduleGradient.ForSlice(_ctx.Schedule, i, light, start, endMinute, segments[i].ThemeId),
+                TextBrush = ThemeBrush.TextOn(light),
                 ThemeName = ResolveThemeName(segments[i].ThemeId),
-                TimeText = TimeOnly.MinValue.AddMinutes(start).ToString("HH:mm"),
+                TimeText = $"{segments[i].StartTime:HH:mm} – {(i == segments.Count - 1 ? "次日 " : "")}{_ctx.Schedule.GetSegmentEndTime(i):HH:mm}",
                 MarkText = mark switch { SegmentMark.Current => "当前", SegmentMark.NextDay => "下一日", _ => "" },
                 ShowMark = mark is SegmentMark.Current or SegmentMark.NextDay,
                 IsCurrent = mark == SegmentMark.Current,
@@ -326,8 +331,13 @@ public partial class TimeAxisPageViewModel : ViewModelBase
 /// <summary>时间轴色带的一段。</summary>
 public partial class ColorBandItem : ViewModelBase
 {
+    /// <summary>当前可见区间对应的主题渐变。</summary>
+    public required IBrush Fill { get; init; }
+
+    /// <summary>绑定主题声明的明暗，同时决定色块与图标。</summary>
+    public bool? Light { get; init; }
     [ObservableProperty] private double _widthPercent;
-    [ObservableProperty] private IBrush _bandBrush = Brushes.Gray;
+    [ObservableProperty] private IBrush _textBrush = Brushes.White;
     [ObservableProperty] private string _themeName = "";
     [ObservableProperty] private string _timeText = "";
     [ObservableProperty] private string _markText = "";
@@ -335,20 +345,28 @@ public partial class ColorBandItem : ViewModelBase
     [ObservableProperty] private bool _isCurrent;
     [ObservableProperty] private bool _isHoldDim;
 
-    partial void OnGradientIndexChanged(int value) => BandBrush = ThemeBrush.ForGradient(value);
-    [ObservableProperty] private int _gradientIndex;
 }
 
-/// <summary>按索引取预置渐变（壁纸预览缺失时的兜底视觉）。</summary>
+/// <summary>按索引取预置渐变（壁纸预览缺失时的兜底视觉）：已知主题明暗时取对应明暗族，未知或未绑定回退中性族。</summary>
 public static class ThemeBrush
 {
-    public static IBrush ForGradient(int index)
+    private static readonly IBrush TextOnLightBrush = new SolidColorBrush(Color.FromRgb(0x1B, 0x1B, 0x1B));
+
+    public static IBrush ForGradient(int index, bool? light = null)
     {
-        var key = "BandGrad" + Math.Abs(index) % 6;
+        var key = light switch
+        {
+            true => "BandGradLight" + Math.Abs(index) % 3,
+            false => "BandGradDark" + Math.Abs(index) % 3,
+            _ => "BandGrad" + Math.Abs(index) % 6,
+        };
         if (Application.Current?.Resources.TryGetResource(key, null, out var value) == true
             && value is IBrush brush) return brush;
         return Brushes.Gray;
     }
+
+    /// <summary>渐变段上的标签颜色：亮渐变配深色文字，暗渐变与兜底配白色。</summary>
+    public static IBrush TextOn(bool? light) => light == true ? TextOnLightBrush : Brushes.White;
 }
 
 /// <summary>主题库页的一项。</summary>
@@ -409,7 +427,7 @@ public partial class ThemeLibraryPageViewModel : ViewModelBase
                 WallpaperPath = t.WallpaperPath,
                 Thumb = thumb,
                 HasThumb = thumb is not null,
-                ThumbBrush = ThemeBrush.ForGradient(Math.Abs(t.Name.GetHashCode()) % 6),
+                ThumbBrush = ThemeBrush.ForGradient(Math.Abs(t.Name.GetHashCode()), t.PreviewUsesLightTheme),
                 FilePath = t.FilePath,
             };
             item.ApplyRequested = ApplyThemeNow;
