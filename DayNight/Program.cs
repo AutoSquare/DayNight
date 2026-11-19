@@ -29,6 +29,9 @@ sealed class Program
     /// <summary>UI 自测：2 秒后触发最小化（验证最小化进托盘）。</summary>
     public static bool UITestMinTray { get; private set; }
 
+    /// <summary>UI 自测：静默启动后模拟托盘「打开主界面」（验证 Opened 订阅已解绑、窗口不再闪现消失）。</summary>
+    public static bool UITestShow { get; private set; }
+
     /// <summary>UI 自测：「保持到明天」完整流程（点已结束行→时间轴保持态→复位）。</summary>
     public static bool UITestHold { get; private set; }
 
@@ -77,6 +80,8 @@ sealed class Program
                       args[uitestFlag + 1].Equals("toast", StringComparison.OrdinalIgnoreCase);
         UITestMinTray = uitestFlag >= 0 && args.Length > uitestFlag + 1 &&
                         args[uitestFlag + 1].Equals("mintray", StringComparison.OrdinalIgnoreCase);
+        UITestShow = uitestFlag >= 0 && args.Length > uitestFlag + 1 &&
+                     args[uitestFlag + 1].Equals("show", StringComparison.OrdinalIgnoreCase);
         UITestHold = uitestFlag >= 0 && args.Length > uitestFlag + 1 &&
                      args[uitestFlag + 1].Equals("hold", StringComparison.OrdinalIgnoreCase);
         UITestTray = uitestFlag >= 0 && args.Length > uitestFlag + 1 &&

@@ -85,6 +85,36 @@ public partial class App
             };
             minTimer.Start();
         }
+        else if (Program.UITestShow)
+        {
+            // 需配合 --silent + SilentStart=true：先静默驻托盘，再走托盘同款 ShowMainWindow。
+            var showTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            showTimer.Tick += (_, _) =>
+            {
+                showTimer.Stop();
+                LogService.Info("[uitest] 模拟托盘「打开主界面」");
+                ShowMainWindow(desktop);
+            };
+            showTimer.Start();
+
+            var checkTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4) };
+            checkTimer.Tick += (_, _) =>
+            {
+                checkTimer.Stop();
+                var visible = desktop.MainWindow?.IsVisible == true;
+                LogService.Info($"[uitest] 打开后 IsVisible={visible}（预期 True；False 表示窗口被静默订阅再次隐藏）");
+            };
+            checkTimer.Start();
+
+            var exitTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(6) };
+            exitTimer.Tick += (_, _) =>
+            {
+                exitTimer.Stop();
+                LogService.Info("[uitest] 验证结束，自动退出");
+                desktop.Shutdown();
+            };
+            exitTimer.Start();
+        }
         else if (Program.UITestToast)
         {
             var toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };

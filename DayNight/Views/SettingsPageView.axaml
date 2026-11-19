@@ -91,6 +91,7 @@
                         <StackPanel Grid.Column="0">
                             <TextBlock Classes="set-title" Text="开机自动启动"/>
                             <TextBlock Classes="set-desc" Text="开机后自动在后台运行"/>
+                            <TextBlock Classes="set-desc" Text="{Binding AutostartNote}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <ToggleSwitch Grid.Column="1" IsChecked="{Binding Autostart}"/>
                     </Grid>

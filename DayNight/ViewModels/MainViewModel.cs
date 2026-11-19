@@ -448,7 +448,10 @@ public partial class SettingsPageViewModel : ViewModelBase
         _isSystemTheme = s.ThemeMode == "system";
         _isLightTheme = s.ThemeMode == "light";
         _isDarkTheme = s.ThemeMode == "dark";
-        _autostart = s.Autostart;
+        // 自启开关显示注册表真实状态：登记项必须指向本程序才显示“开”
+        _autostart = AutostartService.IsEnabled();
+        var autostartHolder = AutostartService.ForeignHolderPath();
+        _autostartNote = autostartHolder is null ? "" : $"自启项正被另一个副本占用（{autostartHolder}），重新打开开关可接管";
         _silentStart = s.SilentStart;
         _minimizeToTray = s.MinimizeToTray;
         _deferWhenFullscreen = s.DeferWhenFullscreen;
@@ -462,6 +465,8 @@ public partial class SettingsPageViewModel : ViewModelBase
     [ObservableProperty] private bool _isLightTheme;
     [ObservableProperty] private bool _isDarkTheme;
     [ObservableProperty] private bool _autostart;
+    // 自启项被其他程序副本占用时的提示文案；空串不占位
+    [ObservableProperty] private string _autostartNote = "";
     [ObservableProperty] private bool _silentStart;
     [ObservableProperty] private bool _minimizeToTray;
     [ObservableProperty] private bool _deferWhenFullscreen;
@@ -496,8 +501,10 @@ public partial class SettingsPageViewModel : ViewModelBase
     partial void OnAutostartChanged(bool value)
     {
         _ctx.Settings.Autostart = value;
-        AutostartService.Sync(value);
+        // 显式操作：开 = 接管登记项（覆盖旧值），关 = 仅删除指向本程序的项
+        if (value) AutostartService.Enable(); else AutostartService.Disable();
         _ctx.Save();
+        if (value) AutostartNote = "";
     }
 
     partial void OnSilentStartChanged(bool value) { _ctx.Settings.SilentStart = value; _ctx.Save(); }

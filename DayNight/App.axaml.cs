@@ -57,8 +57,17 @@ public partial class App : Application
 #endif
             if (Program.SilentStart && ctx.Settings.SilentStart)
             {
-                // Hide 必须在窗口 Opened 之后，否则被随后的自动 Show 吞掉
-                desktop.MainWindow.Opened += (_, _) => desktop.MainWindow.Hide();
+                // Hide 必须在窗口 Opened 之后，否则被随后的自动 Show 吞掉。
+                // 但 Opened 在每次 Show 都会触发：吞掉首次自动显示后必须解绑，
+                // 否则托盘「打开主界面」的 Show 会被再次 Hide（窗口闪现即消失）。
+                void HideOnFirstOpen(object? sender, EventArgs e)
+                {
+                    var window = desktop.MainWindow;
+                    if (window is null) return;
+                    window.Opened -= HideOnFirstOpen;
+                    window.Hide();
+                }
+                desktop.MainWindow.Opened += HideOnFirstOpen;
             }
 
             SetupTray(desktop, mainVm);
