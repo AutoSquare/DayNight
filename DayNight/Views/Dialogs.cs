@@ -60,8 +60,9 @@ public static class Dialogs
             Background = Brushes.Transparent,
             ShowInTaskbar = false,
             CanResize = false,
-            SizeToContent = SizeToContent.WidthAndHeight,
+            SizeToContent = SizeToContent.Height,
             Width = 440,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
             Topmost = true,
             Content = card, // 窗口即卡片：无边框、无黑底、无遮罩
         };
@@ -93,7 +94,6 @@ public static class Dialogs
                 Margin = new Thickness(0, 2, 0, 10),
             });
         }
-        CenterOnOwner(shell, owner);
         shell.Show(owner);
         return shell;
     }
@@ -108,7 +108,6 @@ public static class Dialogs
         confirm.Click += (_, _) => { shell.Close(); save(); };
         discardButton.Click += (_, _) => { shell.Close(); discard(); };
         shell.Closed += (_, _) => closed();
-        CenterOnOwner(shell, owner);
         shell.ShowDialog(owner);
     }
 
@@ -120,28 +119,8 @@ public static class Dialogs
         foot.Children.Insert(1, exit);
         exit.Click += (_, _) => shell.Close(CloseChoice.Exit);
         tray.Click += (_, _) => shell.Close(CloseChoice.MinimizeToTray);
-        shell.WindowStartupLocation = WindowStartupLocation.CenterOwner;
         shell.Opened += (_, _) => tray.Focus();
         return shell.ShowDialog<CloseChoice>(owner);
-    }
-
-    private static void CenterOnOwner(Window shell, Window owner)
-    {
-        shell.Opened += (_, _) =>
-        {
-            try
-            {
-                var screen = owner.Screens.ScreenFromWindow(owner) ?? owner.Screens.All[0];
-                var wa = screen.WorkingArea;
-                shell.Position = new PixelPoint(
-                    wa.X + (int)((wa.Width - shell.Width) / 2),
-                    wa.Y + (int)((wa.Height - shell.Height) / 2));
-            }
-            catch
-            {
-                // 居中失败不致命
-            }
-        };
     }
 }
 

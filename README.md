@@ -3,7 +3,7 @@
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-0078D4)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
 ![UI](https://img.shields.io/badge/UI-Avalonia%2012.1-7c3aed)
-![Version](https://img.shields.io/badge/version-1.1.1-3f4248)
+![Version](https://img.shields.io/badge/version-1.1.2-3f4248)
 ![License](https://img.shields.io/badge/license-MIT-2ea043)
 
 晨昏线是一款按每日计划自动切换 Windows 整套主题的桌面工具。例如 07:00 应用日间主题，22:00 切换到「发光」，并延续到次日 07:00。每个时段绑定一套已安装的 Windows 主题，壁纸、明暗模式、强调色与声音方案随主题一并切换。
@@ -65,7 +65,7 @@ Windows 11 内建的定时切换仅覆盖系统深浅色；整套主题（壁纸
 
 ### 安装步骤
 
-运行安装程序 `DayNight-Setup-1.1.1-win-x64.exe`，安装到当前 Windows 账户。使用文件夹版时，将整个发布文件夹复制到固定位置，双击其中的 `DayNight.exe`。
+运行安装程序 `DayNight-Setup-1.1.2-win-x64.exe`，安装到当前 Windows 账户。使用文件夹版时，将整个发布文件夹复制到固定位置，双击其中的 `DayNight.exe`。
 
 卸载前从托盘菜单选择 **退出**，再从 Windows 的 **设置 → 应用 → 已安装的应用** 卸载晨昏线。卸载程序询问是否删除计划和设置，默认保留。选择删除会清理当前账户的配置、配置备份和临时文件；运行日志保留。静默卸载也会保留配置。
 

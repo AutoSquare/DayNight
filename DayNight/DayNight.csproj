@@ -8,7 +8,7 @@
     <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\daynight.ico</ApplicationIcon>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <IncludeSourceRevisionInInformationalVersion Condition="'$(Configuration)' == 'Release'">false</IncludeSourceRevisionInInformationalVersion>
     <Authors>Jhonie King</Authors>
     <Company>AutoSquare</Company>
