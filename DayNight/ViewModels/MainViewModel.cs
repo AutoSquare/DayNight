@@ -192,6 +192,20 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    /// <summary>主题库点击卡片：应用整套主题，并保持到当前时段结束，避免被下一轮调度检查切回计划。</summary>
+    /// <param name="path">主题文件路径。</param>
+    public async Task ApplyLibraryTheme(string path)
+    {
+        if (!await ApplyThemeDirect(path, manual: true)) return;
+        // 与调度目标一致时无需登记：引擎本就不会切回，已有手动状态保持不变。
+        if (string.Equals(ThemeCatalogService.NormalizePath(path),
+                ThemeCatalogService.NormalizePath(_ctx.Engine.GetEffectiveThemeId(_ctx.Engine.Now)),
+                StringComparison.OrdinalIgnoreCase)) return;
+        _ctx.Engine.HoldUntilNextSwitch();
+        _ctx.Save();
+        _ctx.RaiseStateChanged();
+    }
+
     private void RefreshAll()
     {
         FootStateText = _ctx.IsApplyingTheme ? "正在应用整套主题…" : _ctx.Engine.Paused ? "调度已暂停"
@@ -408,7 +422,9 @@ public partial class ThemeLibraryPageViewModel : ViewModelBase
         // 主题列表由 MainViewModel 后台扫描后注入（LoadThemes），构造时不扫描
     }
 
-    public void ApplyThemeNow(string filePath) => _ = _main.ApplyThemeDirect(filePath, manual: true);
+    /// <summary>主题库点击卡片并确认后应用整套主题，保持到当前时段结束。</summary>
+    /// <param name="filePath">主题文件路径。</param>
+    public void ApplyThemeNow(string filePath) => _ = _main.ApplyLibraryTheme(filePath);
 
     /// <summary>展示后台扫描和解码完成的主题快照。</summary>
     /// <param name="themes">主题元数据。</param>

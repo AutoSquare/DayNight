@@ -131,7 +131,8 @@ public partial class RulesPageViewModel : ViewModelBase
     public string DescribeSwitch(int index, bool hold)
     {
         var now = _ctx.Engine.Now;
-        var until = _ctx.Engine.Manual?.HoldUntil;
+        // 临时保持不会被规则页点行沿用，提示按本次点击的保持方式说明。
+        var until = _ctx.Engine.Manual is { IsTemporary: false } ? _ctx.Engine.Manual.HoldUntil : null;
         if (until > now) return $"保持该主题至 {until:MM-dd HH:mm}。";
         if (hold) return $"保持该主题至 {_ctx.Schedule.GetSegmentEndDateTime(index, now.AddDays(1)):MM-dd HH:mm}。";
         return "应用该时段的整套 Windows 主题。";

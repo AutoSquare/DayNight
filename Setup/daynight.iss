@@ -1,6 +1,6 @@
 ; 晨昏线 DayNight 安装包脚本（Inno Setup 6.4+）
 ; 编译前先用 FolderProfile 发布：dotnet publish .\DayNight\DayNight.csproj -c Release -p:PublishProfile=FolderProfile
-; 版本、公司与版权信息从已发布的 DayNight.exe 读取，不在此手工维护。
+; 版本、公司与版权信息从已发布的 DayNight.exe 读取，不在此手工维护；发布产物早于 DayNight.csproj 时中止编译。
 
 #define MyAppName "晨昏线"
 #define MyAppExeName "DayNight.exe"
@@ -11,6 +11,17 @@
   #error 请先使用 FolderProfile 发布 DayNight，再编译安装包。
 #endif
 #define MyAppVersion GetFileProductVersion(AppExe)
+
+; 发布目录中的程序按修改时间原地覆盖。它早于 DayNight.csproj，说明项目文件（含版本号）在上次发布之后改动过，
+; 此时读到的版本号和打进去的程序都是上一版的，因此中止编译。
+#define ProjectFile AddBackslash(SourcePath) + "..\DayNight\DayNight.csproj"
+#define StampFormat "yyyy/mm/dd hh:nn:ss"
+#if !FileExists(ProjectFile)
+  #error 找不到 DayNight.csproj，无法确认发布产物是否为最新，已中止编译。
+#endif
+#if GetFileDateTimeString(AppExe, StampFormat, "-", ":") < GetFileDateTimeString(ProjectFile, StampFormat, "-", ":")
+  #error 发布目录中的 DayNight.exe 早于 DayNight.csproj，版本号和内容是上一版的。请先用 FolderProfile 重新发布，再编译安装包。
+#endif
 
 [Setup]
 AppId={{5CEE1F89-F37F-4CAF-B128-EF048EF0B9D7}

@@ -220,6 +220,6 @@ public partial class TimeAxisPageView : UserControl
         HelpDialogWindow.Show(TopLevel.GetTopLevel(this) as Window ?? throw new InvalidOperationException("no window"), "今日时间轴说明",
             ("当前主题卡", "显示正在生效的主题与时段；右侧是下次切换时刻，或手动保持的恢复时刻。"),
             ("全天时段分布", "今天的切换计划色带，橙色指针是当前时刻。高亮的一段是当前生效时段；弱化并标「下一日」的段今天被跳过，明天照常执行。"),
-            ("手动保持中", "表示处于手动选择的主题，到恢复时刻会自动回到日程。"));
+            ("手动保持中", "表示处于手动选择的主题（主题库点击卡片，或在 Windows 个性化设置里更换），到恢复时刻会自动回到日程。"));
     }
 }

@@ -24,6 +24,7 @@ public partial class App : Application
     private DateTime _retryAfter;
     private string? _failedTheme;
     private (DateTime date, int index)? _lastObservedSegment;
+    private DateTime _lastTickAt;
 
     public override void Initialize()
     {
@@ -148,6 +149,8 @@ public partial class App : Application
         try
         {
             var now = ctx.Engine.Now;
+            var sinceLastCheck = _lastTickAt == default ? TimeSpan.MaxValue : now - _lastTickAt;
+            _lastTickAt = now;
             var idx = ctx.Schedule.GetSegmentIndexAt(TimeOnly.FromDateTime(now));
             var segmentStart = ctx.Schedule.GetActiveSegmentStart(idx, now);
             var occurrence = (segmentStart, idx);
@@ -159,7 +162,17 @@ public partial class App : Application
                 ctx.RaiseStateChanged();
             }
 
-            if (ctx.Engine.Paused || ctx.IsApplyingTheme) return;
+            if (ctx.IsApplyingTheme) return;
+
+            // 运行期间主题被外部更换（个性化设置等）：不登记会被下方的判定切回，这里视同手动切换。
+            // 启动、唤醒时没有连续的两次读数；本程序自己应用主题时会在结束时同步读取，同样不会登记。
+            if (ctx.Engine.NoteExternalChange(previousTheme, actualTheme, sinceLastCheck))
+            {
+                ctx.Save();
+                ctx.RaiseStateChanged();
+            }
+
+            if (ctx.Engine.Paused) return;
 
             var fullscreen = ctx.Settings.DeferWhenFullscreen && FullscreenDetector.IsFullscreen();
             if (ctx.IsFullscreenDeferred != fullscreen)

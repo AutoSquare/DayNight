@@ -23,6 +23,11 @@ public sealed record SegmentView(int Index, SegmentMark Mark, bool IsHold);
 /// </summary>
 public sealed class ScheduleEngine
 {
+    /// <summary>
+    /// 能把主题变化归因于运行期间手动操作的两次检查最大间隔；超过视为中断（睡眠、休眠）。
+    /// </summary>
+    public static readonly TimeSpan MaxWatchGap = TimeSpan.FromSeconds(3);
+
     private readonly ScheduleConfig _config;
     private ManualState? _manual;
     private Func<DateTime> _clock;
@@ -45,6 +50,15 @@ public sealed class ScheduleEngine
     /// <summary>当前时刻所在的段索引。</summary>
     public int NowSegmentIndex() => _config.GetSegmentIndexAt(TimeOnly.FromDateTime(Now));
 
+    /// <summary>按指定时刻的手动状态应生效的主题路径。</summary>
+    /// <param name="now">判定时刻。</param>
+    /// <returns>当前段或手动选中段绑定的主题。</returns>
+    public string GetEffectiveThemeId(DateTime now)
+    {
+        var index = _config.GetSegmentIndexAt(TimeOnly.FromDateTime(now));
+        return _config.Segments[_manual?.HeldSegmentIndex ?? index].ThemeId;
+    }
+
     /// <summary>清空手动状态（复位）。</summary>
     public void ResetManual()
     {
@@ -59,7 +73,8 @@ public sealed class ScheduleEngine
     public ManualState ClickSegment(int index, bool hold)
     {
         var now = Now;
-        var previousUntil = _manual?.HoldUntil;
+        // 临时保持只针对上一次手动更换的主题，规则页点行是新的手动选择，不沿用它的到期时刻。
+        var previousUntil = _manual is { IsTemporary: false } ? _manual.HoldUntil : null;
         _manual = new ManualState
         {
             HeldSegmentIndex = index,
@@ -69,6 +84,48 @@ public sealed class ScheduleEngine
             ? $"手动切换并保持：段 {index} 至 {_manual.HoldUntil:yyyy-MM-dd HH:mm}"
             : $"手动切换：段 {index}");
         return _manual;
+    }
+
+    /// <summary>
+    /// 登记临时保持：只覆盖当前时段，保持到下一个切换点后恢复计划。
+    /// 主题库手动应用，以及运行期间检测到外部更换主题时调用。
+    /// </summary>
+    /// <returns>登记后的手动状态。</returns>
+    public ManualState HoldUntilNextSwitch()
+    {
+        var now = Now;
+        var index = _config.GetSegmentIndexAt(TimeOnly.FromDateTime(now));
+        _manual = new ManualState
+        {
+            HeldSegmentIndex = index,
+            HoldUntil = _config.GetSegmentEndDateTime(index, _config.GetActiveSegmentStart(index, now)),
+            IsTemporary = true,
+        };
+        LogService.Info($"手动更换主题，保持至 {_manual.HoldUntil:yyyy-MM-dd HH:mm}");
+        return _manual;
+    }
+
+    /// <summary>
+    /// 运行期间实际主题被外部更换（如个性化设置）：视同手动切换，登记到下一个切换点的临时保持。
+    /// 启动、唤醒或本程序刚应用过主题时不满足登记条件，其后的差异仍按对齐处理。
+    /// </summary>
+    /// <param name="previousTheme">上一次读取到的主题路径；为空表示没有可比对的读数。</param>
+    /// <param name="actualTheme">本次读取到的主题路径。</param>
+    /// <param name="sinceLastCheck">距上一次检查经过的时间。</param>
+    /// <returns>已登记临时保持时为 true。</returns>
+    public bool NoteExternalChange(string? previousTheme, string? actualTheme, TimeSpan sinceLastCheck)
+    {
+        // 上一次读数之后程序没有持续运行（启动、睡眠、休眠），其间的变化不能归因于用户的即时操作。
+        if (string.IsNullOrEmpty(previousTheme) || string.IsNullOrEmpty(actualTheme)) return false;
+        if (sinceLastCheck < TimeSpan.Zero || sinceLastCheck > MaxWatchGap) return false;
+        if (string.Equals(previousTheme, actualTheme, StringComparison.OrdinalIgnoreCase)) return false;
+        // 变成计划目标时引擎本就不会切回，登记只会让界面误显示手动保持。
+        if (string.Equals(ThemeCatalogService.NormalizePath(actualTheme),
+                ThemeCatalogService.NormalizePath(GetEffectiveThemeId(Now)), StringComparison.OrdinalIgnoreCase)) return false;
+        // 已在保持中：现有保持覆盖的时间更长，继续沿用；提前生效状态则由临时保持替换。
+        if (_manual is { IsHold: true, HoldUntil: { } until } && until > Now) return false;
+        HoldUntilNextSwitch();
+        return true;
     }
 
     /// <summary>
@@ -130,7 +187,7 @@ public sealed class ScheduleEngine
 
         // 自然/Override 判定：当前应生效的主题
         var effectiveIdx = _manual?.HeldSegmentIndex ?? idx;
-        var target = _config.Segments[effectiveIdx].ThemeId;
+        var target = GetEffectiveThemeId(now);
         if (string.Equals(ThemeCatalogService.NormalizePath(target),
                            ThemeCatalogService.NormalizePath(lastAppliedThemePath ?? string.Empty),
                            StringComparison.OrdinalIgnoreCase))
@@ -183,10 +240,12 @@ public sealed class ScheduleEngine
         var nowTime = TimeOnly.FromDateTime(now);
         var idx = _config.GetSegmentIndexAt(nowTime);
         var actual = ThemeCatalogService.NormalizePath(actualTheme ?? string.Empty);
+        // 临时保持只覆盖当前时段：其余时段仍按计划标记，当前标记照常跟随实际主题。
+        var held = _manual is { IsTemporary: true } ? null : _manual;
         bool Matches(int i) => actual.Length > 0 && string.Equals(actual,
             ThemeCatalogService.NormalizePath(_config.Segments[i].ThemeId), StringComparison.OrdinalIgnoreCase);
         int current = -1;
-        if (_manual is { } manual && Matches(manual.HeldSegmentIndex))
+        if (held is { } manual && Matches(manual.HeldSegmentIndex))
             current = manual.HeldSegmentIndex;
         else
             for (int offset = 0; offset < _config.Segments.Count; offset++)
@@ -201,8 +260,8 @@ public sealed class ScheduleEngine
         {
             SegmentMark mark;
             if (i == current) mark = SegmentMark.Current;
-            else if (i == (_manual?.HeldSegmentIndex ?? idx)) mark = SegmentMark.Upcoming;
-            else if (_manual is { } m)
+            else if (i == (held?.HeldSegmentIndex ?? idx)) mark = SegmentMark.Upcoming;
+            else if (held is { } m)
             {
                 if (m.IsHold) mark = i < m.HeldSegmentIndex ? SegmentMark.Ended : SegmentMark.NextDay;
                 else mark = i < m.HeldSegmentIndex ? SegmentMark.Ended : SegmentMark.Upcoming;
@@ -211,7 +270,7 @@ public sealed class ScheduleEngine
             {
                 mark = _config.Segments[i].StartTime <= nowTime ? SegmentMark.Ended : SegmentMark.Upcoming;
             }
-            views.Add(new SegmentView(i, mark, _manual?.IsHold ?? false));
+            views.Add(new SegmentView(i, mark, held?.IsHold ?? false));
         }
         return views;
     }
